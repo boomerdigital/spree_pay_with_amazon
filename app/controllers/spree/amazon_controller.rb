@@ -48,18 +48,22 @@ class Spree::AmazonController < Spree::StoreController
 
     if address
       current_order.email = spree_current_user.try(:email) || "pending@amazon.com"
-      update_current_order_address!(:ship_address, address, spree_current_user.try(:ship_address))
-      update_current_order_address!(:bill_address, address, spree_current_user.try(:bill_address))
+      if address.country.id == 77
+        update_current_order_address!(:ship_address, address, spree_current_user.try(:ship_address))
+        update_current_order_address!(:bill_address, address, spree_current_user.try(:bill_address))
 
-      current_order.save!
-      current_order.next
+        current_order.save!
+        current_order.next
 
-      current_order.reload
+        current_order.reload
 
-      if current_order.shipments.empty?
-        render plain: 'Not shippable to this address'
+        if current_order.shipments.empty?
+          render plain: 'Not shippable to this address'
+        else
+          render layout: false
+        end
       else
-        render layout: false
+        render plain: 'Not shippable to this address'
       end
     else
       head :ok
